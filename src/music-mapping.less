@@ -1,0 +1,50 @@
+.EP_Educandu_Example_Display {
+}
+
+.EP_Educandu_Example_Display-time {
+  font-style: italic;
+  margin-top: @edu-page-content-padding;
+}
+
+.EP_Educandu_Example_Editor {
+}
+
+.ItemPanel {
+  margin: 10px 0 !important;
+
+  .ant-collapse-header {
+    background-color: @edu-background-color-light !important;
+    border-top-left-radius: @edu-border-radius-base !important;
+    border-top-right-radius: @edu-border-radius-base !important;
+  }
+
+  &.is-dragged {
+    border: 1px solid @edu-border-color-dark;
+  }
+
+  &.is-other-dragged {
+    opacity: 0.6 !important;
+  }
+}
+
+.ItemPanel-header {
+  .m-line-clamp(1);
+}
+
+.ItemPanel-contentWrapper {
+  background-color: @edu-white !important;
+}
+
+.ItemPanel-actionButtons {
+  display: grid;
+  gap: 3px;
+  grid-auto-flow: column;
+}
+
+.mm-align-center {
+  align-items: center !important;
+}
+
+.MusicMapping-loaded-card {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
