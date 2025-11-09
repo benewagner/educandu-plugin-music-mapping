@@ -1,0 +1,46 @@
+benewagner/educandu-plugin-music-mapping:
+  name:
+    en: Music Mapping
+    de: Musik-Mapping
+  elementType:
+    en: Element type
+    de: Elementtyp
+  questionHeader:
+    en: Question + answer
+    de: Frage + Antwort
+  answerHeader:
+    en: Answer (wrong)
+    de: Antwort (falsch)
+  question:
+    en: Question
+    de: Frage
+  answer:
+    en: Answer
+    de: Antwort
+  addElement:
+    en: Add element
+    de: Element hinzufügen
+  text:
+    en: Text
+    de: Text
+  image:
+    en: Image
+    de: Bild
+  audio:
+    en: Audio
+    de: Audio
+  video:
+    en: Video
+    de: Video
+  cardType:
+    en: Card type
+    de: Kartentyp
+  addAnswer:
+    en: Add answer
+    de: Antwort hinzufügen
+  check:
+    en: Check
+    de: Check
+  reset:
+    en: Reset
+    de: Zurücksetzen
