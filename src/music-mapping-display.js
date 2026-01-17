@@ -8,10 +8,19 @@ import { sectionDisplayProps } from '@educandu/educandu/ui/default-prop-types.js
 
 const Arrow = XarrowImport?.default ?? XarrowImport;
 
+// Fisher-Yates shuffle for unbiased randomization
+function shuffleArray(array) {
+  const result = [...array];
+  for (let i = result.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
 export default function MusicMappingDisplay({ content }) {
   const { elements = [], answers = [] } = content ?? {};
   const { t } = useTranslation('benewagner/educandu-plugin-music-mapping');
-  console.log(content);
 
   const [shuffledElements, setShuffledElements] = useState(null);
   const [userAnswers, setUserAnswers] = useState([]); // Array<[questionKey, answerKey]>
@@ -25,13 +34,15 @@ export default function MusicMappingDisplay({ content }) {
   const arrowProps = {
     strokeWidth: 2.5,
     showHead: true,
-    startAnchor: 'bottom',
-    endAnchor: 'top'
+    startAnchor: 'right',
+    endAnchor: 'left'
   };
+
+  const getCardId = key => `card-${key}`;
 
   const renderArrows = () => {
     const getArrowColor = (qKey, aKey) => {
-      if (!isCheck) return '#c4c4c4';
+      if (!isCheck) {return '#c4c4c4';}
       const id = `${qKey}${aKey}`;
       return correctIdsRef.current.has(id) ? '#4CAF50' : '#E57373';
     };
@@ -41,27 +52,27 @@ export default function MusicMappingDisplay({ content }) {
     return (
       <div>
         {userAnswers.map(([q, a]) => (
-          <Arrow key={`ua-${q}-${a}`} start={q} end={a} color={getArrowColor(q, a)} {...arrowProps} />
+          <Arrow key={`ua-${q}-${a}`} start={getCardId(q)} end={getCardId(a)} color={getArrowColor(q, a)} {...arrowProps} />
         ))}
         {isCheck
           ? correctPairsRef.current.map(([q, a]) =>
             isUserAnswer(q, a)
               ? null
-              : <Arrow key={`ca-${q}-${a}`} start={q} end={a} color="#2196F3" {...arrowProps} />
+              : <Arrow key={`ca-${q}-${a}`} start={getCardId(q)} end={getCardId(a)} color="#2196F3" {...arrowProps} />
           )
           : null}
       </div>
     );
   };
 
-  const toggleLoadedClass = id => {
-    const el = document.querySelector(`#${id}`);
-    if (!el) return;
+  const toggleLoadedClass = key => {
+    const el = document.getElementById(getCardId(key));
+    if (!el) {return;}
     el.classList.toggle('MusicMapping-loaded-card');
   };
 
-  const clearLoadedClass = id => {
-    document.querySelector(`#${id}`)?.classList.remove('MusicMapping-loaded-card');
+  const clearLoadedClass = key => {
+    document.getElementById(getCardId(key))?.classList.remove('MusicMapping-loaded-card');
   };
 
   const handleCardClick = elem => {
@@ -69,7 +80,7 @@ export default function MusicMappingDisplay({ content }) {
     const oldA = drawNewArrowRef.current.answer;
 
     if (elem.type === 'question') {
-      if (oldQ && oldQ !== elem.key) clearLoadedClass(oldQ);
+      if (oldQ && oldQ !== elem.key) {clearLoadedClass(oldQ);}
       drawNewArrowRef.current.question = elem.key;
 
       if (oldA) {
@@ -82,7 +93,7 @@ export default function MusicMappingDisplay({ content }) {
         }
       }
     } else {
-      if (oldA && oldA !== elem.key) clearLoadedClass(oldA);
+      if (oldA && oldA !== elem.key) {clearLoadedClass(oldA);}
       drawNewArrowRef.current.answer = elem.key;
 
       if (oldQ) {
@@ -96,9 +107,9 @@ export default function MusicMappingDisplay({ content }) {
       }
     }
 
-    const hasOneSide =
-      (drawNewArrowRef.current.question && !drawNewArrowRef.current.answer) ||
-      (!drawNewArrowRef.current.question && drawNewArrowRef.current.answer);
+    const hasOneSide
+      = (drawNewArrowRef.current.question && !drawNewArrowRef.current.answer)
+      || (!drawNewArrowRef.current.question && drawNewArrowRef.current.answer);
 
     if (hasOneSide) {
       toggleLoadedClass(elem.key);
@@ -108,36 +119,36 @@ export default function MusicMappingDisplay({ content }) {
   };
 
   useLayoutEffect(() => {
-    // Shuffle defensiv
-    const elems = [...elements].sort(() => Math.random() - 0.5);
+    const elems = shuffleArray(elements);
 
     // Baue die Menge korrekter Paare aus Question.answers (Antwort-KEYS) und answers (Key→Label)
     const answerKeySet = new Set((answers ?? []).map(a => a?.[0]));
     const pairs = [];
     const idSet = new Set();
 
-    for (const el of elems) {
-      if (el?.type !== 'question') continue;
-      const qKey = el.key;
-      const allowedAnswerKeys = el.answers ?? [];
-      for (const aKey of allowedAnswerKeys) {
-        if (!aKey || !answerKeySet.has(aKey)) continue;
-        pairs.push([qKey, aKey]);
-        idSet.add(`${qKey}${aKey}`);
-      }
-    }
+    elems
+      .filter(el => el?.type === 'question')
+      .forEach(el => {
+        const qKey = el.key;
+        (el.answers ?? [])
+          .filter(aKey => aKey && answerKeySet.has(aKey))
+          .forEach(aKey => {
+            pairs.push([qKey, aKey]);
+            idSet.add(`${qKey}${aKey}`);
+          });
+      });
 
     correctPairsRef.current = pairs;
     correctIdsRef.current = idSet;
     setShuffledElements(elems);
   }, [elements, answers]);
 
-  if (!shuffledElements) return null;
+  if (!shuffledElements) {return null;}
 
   return (
     <div className='EP_Educandu_Example_Display'>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '200px', justifyContent: 'space-evenly', width: '100%' }}>
-        <div className='MusicMapping-QuestionContainer' style={{ display: 'flex', justifyContent: 'space-evenly', width: '100%' }}>
+      <div style={{ display: 'flex', flexDirection: 'row', gap: '100px', justifyContent: 'space-between', width: '100%' }}>
+        <div className='MusicMapping-QuestionContainer' style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
           {shuffledElements.map(el =>
             el.type === 'question'
               ? <Card key={el.key} elem={el} onClick={() => handleCardClick(el)} />
@@ -145,7 +156,7 @@ export default function MusicMappingDisplay({ content }) {
           )}
         </div>
 
-        <div className='MusicMapping-AnswerContainer' style={{ display: 'flex', justifyContent: 'space-evenly', width: '100%' }}>
+        <div className='MusicMapping-AnswerContainer' style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1, alignItems: 'flex-end' }}>
           {shuffledElements.map(el =>
             el.type === 'answer'
               ? <Card key={el.key} elem={el} onClick={() => handleCardClick(el)} />
@@ -164,7 +175,7 @@ export default function MusicMappingDisplay({ content }) {
             setUserAnswers([]);
             setIsCheck(false);
           }}
-        >
+          >
           {t('reset')}
         </Button>
       </div>

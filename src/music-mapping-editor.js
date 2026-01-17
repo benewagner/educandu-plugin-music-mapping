@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-no-leaked-render */
-import React, { useRef, useId, useState, useEffect } from 'react';
+import React, { useRef, useId, useEffect } from 'react';
 import ItemPanel from './custom-item-panel.js';
 import { useTranslation } from 'react-i18next';
 import { PlusOutlined } from '@ant-design/icons';
@@ -47,17 +47,17 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
   // versuchen wir, diese auf Keys zu mappen.
   const didNormalizeRef = useRef(false);
   useEffect(() => {
-    if (didNormalizeRef.current) return;
+    if (didNormalizeRef.current) {return;}
 
     const labelToKey = new Map((answers ?? []).map(([k, lbl]) => [lbl, k]));
     let changed = false;
 
     const normalized = (elements ?? []).map(el => {
-      if (el?.type !== 'question') return el;
+      if (el?.type !== 'question') {return el;}
       const raw = el.answers ?? [];
       const mapped = raw.map(x => {
         // Wenn x bereits ein bekannter Key ist, so lassen; sonst über Label->Key map
-        if ((answers ?? []).some(a => a?.[0] === x)) return x;
+        if ((answers ?? []).some(a => a?.[0] === x)) {return x;}
         return labelToKey.get(x) ?? x;
       });
       if (JSON.stringify(mapped) !== JSON.stringify(raw)) {
@@ -82,7 +82,7 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
   const handleElementTypeChanged = (event, index, elem) => {
     const value = event.target.value;
     const newElements = cloneDeep(elements);
-    let newAnswers = [...(answers ?? [])];
+    let newAnswers = [...answers ?? []];
 
     newElements[index].type = value;
 
@@ -195,7 +195,7 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
     const newElements = cloneDeep(elements);
     newElements[index].label = value;
 
-    let newAnswers = [...(answers ?? [])];
+    let newAnswers = [...answers ?? []];
     if (elem.type === 'answer') {
       // Mapping-Eintrag [key, label] aktualisieren
       newAnswers = newAnswers.map(answer =>
@@ -235,7 +235,7 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
         value={(elements[index].answers ?? [])}
         onChange={vals => handleAnswerChanged(vals, index)}
         placeholder={t('selectAnswers')}
-      >
+        >
         {(answers ?? []).map(answer => (
           <Select.Option key={answer[0]} value={answer[0]}>
             {answer[1]}
@@ -261,7 +261,7 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
         onMoveUp={handleMoveElementUp}
         onMoveDown={handleMoveElementDown}
         onDelete={i => handleDeleteElement(i, elem)}
-      >
+        >
         <FormItem label={t('elementType')} {...FORM_ITEM_LAYOUT}>
           <RadioGroup value={elem.type} onChange={event => handleElementTypeChanged(event, index, elem)}>
             <RadioButton value='question'>{t('question')}</RadioButton>
@@ -284,7 +284,7 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
               value={elem.sourceUrl}
               allowedSourceTypes={allowedImageSourceTypes}
               onChange={(value, metadata) => handleSourceUrlChange(value, metadata, elem, index)}
-            />
+              />
           </Form.Item>
         )}
 
@@ -314,7 +314,7 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
           droppableId={droppableIdRef.current}
           items={dragAndDropPanelItems}
           onItemMove={handleMoveElement}
-        />
+          />
       </Form>
 
       <Button type='primary' icon={<PlusOutlined />} onClick={handleAddButtonClick}>

@@ -54,11 +54,23 @@
     },
     "check": {
       "en": "Check",
-      "de": "Check"
+      "de": "Prüfen"
     },
     "reset": {
       "en": "Reset",
       "de": "Zurücksetzen"
+    },
+    "answers": {
+      "en": "Answers",
+      "de": "Antworten"
+    },
+    "selectAnswers": {
+      "en": "Select answers...",
+      "de": "Antworten auswählen..."
+    },
+    "URL": {
+      "en": "URL",
+      "de": "URL"
     }
   }
 }

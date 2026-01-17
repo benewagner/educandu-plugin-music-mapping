@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Collapse, Input, Tooltip } from 'antd';
 import DeleteIcon from '@educandu/educandu/components/icons/general/delete-icon.js';
@@ -95,7 +95,7 @@ function ItemPanel({
                 disabled={actionButton.disabled}
                 className={classNames('u-action-button', { 'u-danger-action-button': actionButton.danger })}
                 onClick={event => handleActionButtonClick(event, actionButton)}
-              />
+                />
             </Tooltip>
           </div>
         ))}
@@ -111,7 +111,7 @@ function ItemPanel({
           className='ItemPanel-header MusicMapping-header'
           style={{ display: 'flex', alignItems: 'center', marginLeft: '0.5rem' }}
           spellCheck={false}
-        >
+          >
           <span style={{ marginRight: '0.5rem' }}>{`${t(elemType)}: `}</span>
           <Input value={label} placeholder='Namen eingeben...' style={{ maxWidth: '170px' }} onChange={onLabelChange} />
         </div>
@@ -122,22 +122,12 @@ function ItemPanel({
         className='ItemPanel-header'
         {...dragHandleProps}
         style={{ display: 'flex', alignItems: 'center', marginLeft: '0.5rem', height: '32px' }}
-      >
+        >
         <span style={{ marginRight: '20px' }}>{`${t(elemType)}:`}</span>
         <span>{label}</span>
       </div>
     );
   };
-
-  useLayoutEffect(() => {
-    const headers = document.querySelectorAll('.MusicMapping-header');
-    for (const header of headers) {
-      const grandParent = header.parentElement.parentElement;
-      // const iconToggle = grandParent.firstChild;
-      // iconToggle.addEventListener('click', () => setIsOpen(prev => !prev));
-      grandParent.classList.add('mm-align-center');
-    }
-  }, []);
 
   return (
     <Collapse
@@ -145,7 +135,7 @@ function ItemPanel({
       className={classNames('ItemPanel', { 'is-dragged': isDragged, 'is-other-dragged': isOtherDragged })}
       defaultActiveKey='panel'
       onChange={() => setIsOpen(prev => !prev)}
-    >
+      >
       <Collapse.Panel key='panel' header={renderHeader()} extra={renderActionButtons()}>
         <div className='ItemPanel-contentWrapper'>{children}</div>
       </Collapse.Panel>

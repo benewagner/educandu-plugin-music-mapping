@@ -51,9 +51,25 @@ class MusicMappingInfo {
   }
 
   validateContent(content) {
+    const elementSchema = joi.object({
+      key: joi.string().required(),
+      label: joi.string().allow('').required(),
+      type: joi.string().valid('question', 'answer').required(),
+      sourceUrl: joi.string().allow('').required(),
+      text: joi.string().allow('').required(),
+      cardType: joi.string().valid('text', 'image', 'audio', 'video').required(),
+      copyrightNotice: joi.string().allow('').required(),
+      answers: joi.array().items(joi.string()).optional()
+    });
+
+    const answerMappingSchema = joi.array().ordered(
+      joi.string().required(),
+      joi.string().allow('').required()
+    );
+
     const schema = joi.object({
-      elements: joi.array(),
-      answers: joi.array()
+      elements: joi.array().items(elementSchema).required(),
+      answers: joi.array().items(answerMappingSchema).required()
     });
 
     joi.attempt(content, schema, { abortEarly: false, convert: false, noDefaults: true });
@@ -66,13 +82,28 @@ class MusicMappingInfo {
   redactContent(content, targetRoomId) {
     const redactedContent = cloneDeep(content);
 
-    redactedContent.text = this.gfm.redactCdnResources(redactedContent.text, url => (couldAccessUrlFromRoom(url, targetRoomId) ? url : ''));
+    const redactUrl = url => couldAccessUrlFromRoom(url, targetRoomId) ? url : '';
+
+    redactedContent.elements = (redactedContent.elements ?? []).map(element => ({
+      ...element,
+      sourceUrl: redactUrl(element.sourceUrl),
+      copyrightNotice: this.gfm.redactCdnResources(element.copyrightNotice ?? '', redactUrl)
+    }));
 
     return redactedContent;
   }
 
   getCdnResources(content) {
-    return this.gfm.extractCdnResources(content.text);
+    const resources = [];
+    for (const element of content.elements ?? []) {
+      if (element.sourceUrl) {
+        resources.push(element.sourceUrl);
+      }
+      if (element.copyrightNotice) {
+        resources.push(...this.gfm.extractCdnResources(element.copyrightNotice));
+      }
+    }
+    return resources;
   }
 }
 
