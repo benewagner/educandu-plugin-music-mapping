@@ -11,6 +11,7 @@ const Arrow = XarrowImport?.default ?? XarrowImport;
 export default function MusicMappingDisplay({ content }) {
   const { elements = [], answers = [] } = content ?? {};
   const { t } = useTranslation('benewagner/educandu-plugin-music-mapping');
+  console.log(content);
 
   const [shuffledElements, setShuffledElements] = useState(null);
   const [userAnswers, setUserAnswers] = useState([]); // Array<[questionKey, answerKey]>
@@ -23,7 +24,7 @@ export default function MusicMappingDisplay({ content }) {
 
   const arrowProps = {
     strokeWidth: 2.5,
-    showHead: false,
+    showHead: true,
     startAnchor: 'bottom',
     endAnchor: 'top'
   };
@@ -44,10 +45,10 @@ export default function MusicMappingDisplay({ content }) {
         ))}
         {isCheck
           ? correctPairsRef.current.map(([q, a]) =>
-              isUserAnswer(q, a)
-                ? null
-                : <Arrow key={`ca-${q}-${a}`} start={q} end={a} color="#2196F3" {...arrowProps} />
-            )
+            isUserAnswer(q, a)
+              ? null
+              : <Arrow key={`ca-${q}-${a}`} start={q} end={a} color="#2196F3" {...arrowProps} />
+          )
           : null}
       </div>
     );
