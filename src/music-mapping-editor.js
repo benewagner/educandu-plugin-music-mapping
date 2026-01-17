@@ -14,20 +14,15 @@ import { FORM_ITEM_LAYOUT, SOURCE_TYPE } from '@educandu/educandu/domain/constan
 import DragAndDropContainer from '@educandu/educandu/components/drag-and-drop-container.js';
 import { swapItemsAt, removeItemAt, ensureIsExcluded, moveItem } from '@educandu/educandu/utils/array-utils.js';
 
-function createCopyrightForSource({ oldSourceUrl, oldCopyrightNotice, sourceUrl, metadata, t }) {
+function createCopyrightForSource({ oldSourceUrl, oldCopyrightNotice, sourceUrl }) {
   if (oldSourceUrl === sourceUrl) {
     return oldCopyrightNotice;
   }
   if (!sourceUrl) {
     return '';
   }
-  if (metadata.sourceType === SOURCE_TYPE.youtube && metadata.copyrightLink) {
-    return t('common:youtubeCopyrightNotice', { link: metadata.copyrightLink });
-  }
-  if (metadata.sourceType === SOURCE_TYPE.wikimedia && metadata.copyrightLink) {
-    return t('common:wikimediaCopyrightNotice', { link: metadata.copyrightLink });
-  }
-  return '';
+  // Copyright notices are now handled via the CopyrightNoticeEditor or manually by the user
+  return oldCopyrightNotice || '';
 }
 
 const FormItem = Form.Item;
@@ -112,7 +107,6 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
     if (value === 'text') {
       newElements[index].copyrightNotice = '';
       newElements[index].sourceUrl = '';
-      newElements[index].clipEffect = 'none';
     }
     changeContent({ elements: newElements });
   };
@@ -169,7 +163,7 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
   };
 
   // Medien-URL ändern
-  const handleSourceUrlChange = (value, metadata, elem, index) => {
+  const handleSourceUrlChange = (value, elem, index) => {
     const newElements = cloneDeep(elements);
     newElements[index] = {
       ...elem,
@@ -177,16 +171,15 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
       copyrightNotice: createCopyrightForSource({
         oldSourceUrl: elem.sourceUrl,
         oldCopyrightNotice: elem.copyrightNotice,
-        sourceUrl: value,
-        metadata,
-        t
-      }),
-      clipEffect: 'none'
+        sourceUrl: value
+      })
     };
     changeContent({ elements: newElements });
   };
 
+  // Images don't support YouTube, but audio/video do
   const allowedImageSourceTypes = ensureIsExcluded(Object.values(SOURCE_TYPE), SOURCE_TYPE.youtube);
+  const allowedMediaSourceTypes = Object.values(SOURCE_TYPE);
 
   // Label-Änderung eines Elements
   const onLabelChange = (event, index, elem) => {
@@ -282,8 +275,8 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
           <Form.Item label={t('URL')} {...FORM_ITEM_LAYOUT}>
             <UrlInput
               value={elem.sourceUrl}
-              allowedSourceTypes={allowedImageSourceTypes}
-              onChange={(value, metadata) => handleSourceUrlChange(value, metadata, elem, index)}
+              allowedSourceTypes={elem.cardType === 'image' ? allowedImageSourceTypes : allowedMediaSourceTypes}
+              onChange={value => handleSourceUrlChange(value, elem, index)}
               />
           </Form.Item>
         )}

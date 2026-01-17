@@ -80,7 +80,15 @@ export default function MusicMappingDisplay({ content }) {
     const oldA = drawNewArrowRef.current.answer;
 
     if (elem.type === 'question') {
-      if (oldQ && oldQ !== elem.key) {clearLoadedClass(oldQ);}
+      // Clicking the same question again deselects it
+      if (oldQ === elem.key) {
+        clearLoadedClass(elem.key);
+        delete drawNewArrowRef.current.question;
+        setIsCheck(false);
+        return;
+      }
+
+      if (oldQ) {clearLoadedClass(oldQ);}
       drawNewArrowRef.current.question = elem.key;
 
       if (oldA) {
@@ -90,10 +98,22 @@ export default function MusicMappingDisplay({ content }) {
           arrowIdentifiers.current.add(id);
           setUserAnswers(prev => [...prev, [elem.key, oldA]]);
           drawNewArrowRef.current = {};
+        } else {
+          drawNewArrowRef.current = {};
         }
+      } else {
+        toggleLoadedClass(elem.key);
       }
     } else {
-      if (oldA && oldA !== elem.key) {clearLoadedClass(oldA);}
+      // Clicking the same answer again deselects it
+      if (oldA === elem.key) {
+        clearLoadedClass(elem.key);
+        delete drawNewArrowRef.current.answer;
+        setIsCheck(false);
+        return;
+      }
+
+      if (oldA) {clearLoadedClass(oldA);}
       drawNewArrowRef.current.answer = elem.key;
 
       if (oldQ) {
@@ -103,16 +123,12 @@ export default function MusicMappingDisplay({ content }) {
           arrowIdentifiers.current.add(id);
           setUserAnswers(prev => [...prev, [oldQ, elem.key]]);
           drawNewArrowRef.current = {};
+        } else {
+          drawNewArrowRef.current = {};
         }
+      } else {
+        toggleLoadedClass(elem.key);
       }
-    }
-
-    const hasOneSide
-      = (drawNewArrowRef.current.question && !drawNewArrowRef.current.answer)
-      || (!drawNewArrowRef.current.question && drawNewArrowRef.current.answer);
-
-    if (hasOneSide) {
-      toggleLoadedClass(elem.key);
     }
 
     setIsCheck(false);
@@ -147,8 +163,8 @@ export default function MusicMappingDisplay({ content }) {
 
   return (
     <div className='EP_Educandu_Example_Display'>
-      <div style={{ display: 'flex', flexDirection: 'row', gap: '100px', justifyContent: 'space-between', width: '100%' }}>
-        <div className='MusicMapping-QuestionContainer' style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
+      <div style={{ display: 'flex', flexDirection: 'row', gap: '100px', width: '100%' }}>
+        <div className='MusicMapping-QuestionContainer' style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1, alignItems: 'flex-start' }}>
           {shuffledElements.map(el =>
             el.type === 'question'
               ? <Card key={el.key} elem={el} onClick={() => handleCardClick(el)} />
