@@ -4,9 +4,10 @@ import ItemPanel from './custom-item-panel.js';
 import { useTranslation } from 'react-i18next';
 import { PlusOutlined } from '@ant-design/icons';
 import MusicMappingInfo from './music-mapping-info.js';
-import { Form, Button, Radio, Input, Select } from 'antd';
+import { Form, Button, Radio, Input, Select, Checkbox } from 'antd';
 import cloneDeep from '@educandu/educandu/utils/clone-deep.js';
 import UrlInput from '@educandu/educandu/components/url-input.js';
+import AbcInput from '@educandu/educandu/components/abc-input.js';
 import MarkdownInput from '@educandu/educandu/components/markdown-input.js';
 import { useService } from '@educandu/educandu/components/container-context.js';
 import { sectionEditorProps } from '@educandu/educandu/ui/default-prop-types.js';
@@ -99,7 +100,7 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
     changeContent({ elements: newElements, answers: newAnswers });
   };
 
-  // Karten-Content-Typ (text/image/audio/video)
+  // Karten-Content-Typ (text/image/audio/video/abc)
   const handleCardTypeChanged = (event, index) => {
     const value = event.target.value;
     const newElements = cloneDeep(elements);
@@ -107,6 +108,15 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
     if (value === 'text') {
       newElements[index].copyrightNotice = '';
       newElements[index].sourceUrl = '';
+      newElements[index].abcCode = '';
+      newElements[index].playMidi = false;
+    } else if (value === 'abc') {
+      newElements[index].sourceUrl = '';
+      newElements[index].abcCode = newElements[index].abcCode || '';
+      newElements[index].playMidi = newElements[index].playMidi || false;
+    } else {
+      newElements[index].abcCode = '';
+      newElements[index].playMidi = false;
     }
     changeContent({ elements: newElements });
   };
@@ -206,6 +216,20 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
     changeContent({ elements: newElements });
   };
 
+  // ABC Code ändern
+  const handleAbcCodeChange = (event, index) => {
+    const newElements = cloneDeep(elements);
+    newElements[index].abcCode = event.target.value;
+    changeContent({ elements: newElements });
+  };
+
+  // Play MIDI ändern
+  const handlePlayMidiChange = (event, index) => {
+    const newElements = cloneDeep(elements);
+    newElements[index].playMidi = event.target.checked;
+    changeContent({ elements: newElements });
+  };
+
   // Antworten der Frage ändern (hier werden Antwort-KEYS gespeichert)
   const handleAnswerChanged = (values, index) => {
     const newElements = cloneDeep(elements);
@@ -268,10 +292,11 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
             <RadioButton value='image'>{t('image')}</RadioButton>
             <RadioButton value='audio'>{t('audio')}</RadioButton>
             <RadioButton value='video'>{t('video')}</RadioButton>
+            <RadioButton value='abc'>{t('abc')}</RadioButton>
           </RadioGroup>
         </FormItem>
 
-        {elem.cardType !== 'text' && (
+        {['image', 'audio', 'video'].includes(elem.cardType) && (
           <Form.Item label={t('URL')} {...FORM_ITEM_LAYOUT}>
             <UrlInput
               value={elem.sourceUrl}
@@ -287,7 +312,19 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
           </Form.Item>
         )}
 
-        {elem.cardType !== 'text' && renderCopyrightNoticeInput(elem.copyrightNotice, handleCopyrightNoticeChange, index)}
+        {elem.cardType === 'abc' && (
+          <Form.Item label={t('abcCode')} {...FORM_ITEM_LAYOUT}>
+            <AbcInput value={elem.abcCode} onChange={e => handleAbcCodeChange(e, index)} debounced />
+          </Form.Item>
+        )}
+
+        {elem.cardType === 'abc' && (
+          <Form.Item {...FORM_ITEM_LAYOUT} label={t('playMidi')}>
+            <Checkbox checked={elem.playMidi} onChange={e => handlePlayMidiChange(e, index)} />
+          </Form.Item>
+        )}
+
+        {!['text', 'abc'].includes(elem.cardType) && renderCopyrightNoticeInput(elem.copyrightNotice, handleCopyrightNoticeChange, index)}
 
         {elem.type === 'question' && renderAnswerDropdown(index)}
       </ItemPanel>

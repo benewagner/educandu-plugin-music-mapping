@@ -44,6 +44,18 @@
       "en": "Video",
       "de": "Video"
     },
+    "abc": {
+      "en": "ABC",
+      "de": "ABC"
+    },
+    "abcCode": {
+      "en": "ABC Code",
+      "de": "ABC-Code"
+    },
+    "playMidi": {
+      "en": "Audio Player",
+      "de": "Audio-Player"
+    },
     "cardType": {
       "en": "Card type",
       "de": "Kartentyp"

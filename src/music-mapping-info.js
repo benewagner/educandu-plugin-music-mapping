@@ -1,6 +1,6 @@
 import joi from 'joi';
 import React from 'react';
-import { ClockCircleOutlined } from '@ant-design/icons';
+import MusicMappingIcon from './music-mapping-icon.js';
 import uniqueId from '@educandu/educandu/utils/unique-id.js';
 import cloneDeep from '@educandu/educandu/utils/clone-deep.js';
 import { couldAccessUrlFromRoom } from '@educandu/educandu/utils/source-utils.js';
@@ -20,7 +20,7 @@ class MusicMappingInfo {
   }
 
   getIcon() {
-    return <ClockCircleOutlined />;
+    return <MusicMappingIcon />;
   }
 
   async resolveDisplayComponent() {
@@ -39,6 +39,8 @@ class MusicMappingInfo {
       sourceUrl: '',
       text: '',
       cardType: 'text',
+      abcCode: '',
+      playMidi: false,
       copyrightNotice: ''
     };
   }
@@ -57,7 +59,9 @@ class MusicMappingInfo {
       type: joi.string().valid('question', 'answer').required(),
       sourceUrl: joi.string().allow('').required(),
       text: joi.string().allow('').required(),
-      cardType: joi.string().valid('text', 'image', 'audio', 'video').required(),
+      cardType: joi.string().valid('text', 'image', 'audio', 'video', 'abc').required(),
+      abcCode: joi.string().allow('').optional(),
+      playMidi: joi.boolean().optional(),
       copyrightNotice: joi.string().allow('').required(),
       answers: joi.array().items(joi.string()).optional()
     });

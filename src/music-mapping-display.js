@@ -161,13 +161,23 @@ export default function MusicMappingDisplay({ content }) {
 
   if (!shuffledElements) {return null;}
 
+  // Build media number map: assign sequential numbers to all audio and video cards
+  const mediaNumberMap = new Map();
+  let mediaCounter = 1;
+  shuffledElements.forEach(el => {
+    if (el.cardType === 'audio' || el.cardType === 'video') {
+      mediaNumberMap.set(el.key, mediaCounter);
+      mediaCounter += 1;
+    }
+  });
+
   return (
     <div className='EP_Educandu_Example_Display'>
       <div style={{ display: 'flex', flexDirection: 'row', gap: '100px', width: '100%' }}>
         <div className='MusicMapping-QuestionContainer' style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1, alignItems: 'flex-start' }}>
           {shuffledElements.map(el =>
             el.type === 'question'
-              ? <Card key={el.key} elem={el} onClick={() => handleCardClick(el)} />
+              ? <Card key={el.key} elem={el} mediaNumber={mediaNumberMap.get(el.key)} onClick={() => handleCardClick(el)} />
               : null
           )}
         </div>
@@ -175,7 +185,7 @@ export default function MusicMappingDisplay({ content }) {
         <div className='MusicMapping-AnswerContainer' style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1, alignItems: 'flex-end' }}>
           {shuffledElements.map(el =>
             el.type === 'answer'
-              ? <Card key={el.key} elem={el} onClick={() => handleCardClick(el)} />
+              ? <Card key={el.key} elem={el} mediaNumber={mediaNumberMap.get(el.key)} onClick={() => handleCardClick(el)} />
               : null
           )}
         </div>

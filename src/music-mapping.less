@@ -46,3 +46,93 @@
 .MusicMapping-loaded-card {
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
+
+.MusicMapping-card {
+  position: relative;
+}
+
+.MusicMapping-card-mediaPreview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  margin: 0 auto;
+  border-radius: 8px;
+  background-color: @edu-background-color-light;
+  font-size: 1rem;
+  font-weight: 600;
+  color: @edu-text-color;
+}
+
+.MusicMapping-card-controls {
+  // Default: visible and in normal flow (for touch devices)
+}
+
+
+@media (hover: hover) {
+  // Audio cards: controls as hover extension
+  .MusicMapping-card-controls {
+    position: absolute;
+    top: calc(100% - 8px);
+    left: -1px;
+    right: -1px;
+    background: white;
+    border: 1px solid lightgrey;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 0.5rem 0.8rem;
+    z-index: 10;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease, visibility 0.15s ease;
+  }
+
+  .MusicMapping-card:hover .MusicMapping-card-controls {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  // ABC card: remove bottom corners on hover so controls connect seamlessly
+  .MusicMapping-card--abc:hover {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-color: transparent;
+  }
+
+  .MusicMapping-card--abc .MusicMapping-card-controls {
+    top: calc(100% - 14px);
+    border-top: none;
+  }
+
+  // Video card: controls extend the card visually
+  .MusicMapping-card--video .MediaPlayer-underPlayerContent {
+    position: absolute;
+    top: calc(100% - 8px);
+    left: calc(-0.8rem - 1px);
+    right: calc(-0.8rem - 1px);
+    background: white;
+    border: 1px solid lightgrey;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 0.8rem;
+    z-index: 10;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease, visibility 0.15s ease;
+  }
+
+  .MusicMapping-card--video:hover {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .MusicMapping-card--video:hover .MediaPlayer-underPlayerContent {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+}
