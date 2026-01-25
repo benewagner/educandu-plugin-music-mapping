@@ -45,10 +45,44 @@
 
 .MusicMapping-loaded-card {
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+
+  .MusicMapping-clickArea {
+    background-color: #ade488;
+  }
+}
+
+.MusicMapping-clickArea {
+  width: 40px;
+  flex-shrink: 0;
+  cursor: pointer;
+  background-color: #e8e8e8;
+  border-radius: 0;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: #ade488;
+  }
+}
+
+.MusicMapping-card-content {
+  position: relative;
 }
 
 .MusicMapping-card {
   position: relative;
+  border-radius: 8px;
+}
+
+// Questions: click area on right, remove right inner corners
+.MusicMapping-card--question {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+// Answers: click area on left, remove left inner corners
+.MusicMapping-card--answer {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 .MusicMapping-card-mediaPreview {
@@ -89,14 +123,14 @@
     transition: opacity 0.15s ease, visibility 0.15s ease;
   }
 
-  .MusicMapping-card:hover .MusicMapping-card-controls {
+  .MusicMapping-card-content:hover .MusicMapping-card-controls {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
   }
 
   // ABC card: remove bottom corners on hover so controls connect seamlessly
-  .MusicMapping-card--abc:hover {
+  .MusicMapping-card--abc:has(.MusicMapping-card-content:hover) {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     border-bottom-color: transparent;
@@ -125,12 +159,12 @@
     transition: opacity 0.15s ease, visibility 0.15s ease;
   }
 
-  .MusicMapping-card--video:hover {
+  .MusicMapping-card--video:has(.MusicMapping-card-content:hover) {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
   }
 
-  .MusicMapping-card--video:hover .MediaPlayer-underPlayerContent {
+  .MusicMapping-card--video .MusicMapping-card-content:hover .MediaPlayer-underPlayerContent {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;

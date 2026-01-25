@@ -97,10 +97,11 @@ export default function MusicMappingDisplay({ content }) {
         if (!arrowIdentifiers.current.has(id)) {
           arrowIdentifiers.current.add(id);
           setUserAnswers(prev => [...prev, [elem.key, oldA]]);
-          drawNewArrowRef.current = {};
         } else {
-          drawNewArrowRef.current = {};
+          arrowIdentifiers.current.delete(id);
+          setUserAnswers(prev => prev.filter(([q, a]) => !(q === elem.key && a === oldA)));
         }
+        drawNewArrowRef.current = {};
       } else {
         toggleLoadedClass(elem.key);
       }
@@ -122,10 +123,11 @@ export default function MusicMappingDisplay({ content }) {
         if (!arrowIdentifiers.current.has(id)) {
           arrowIdentifiers.current.add(id);
           setUserAnswers(prev => [...prev, [oldQ, elem.key]]);
-          drawNewArrowRef.current = {};
         } else {
-          drawNewArrowRef.current = {};
+          arrowIdentifiers.current.delete(id);
+          setUserAnswers(prev => prev.filter(([q, a]) => !(q === oldQ && a === elem.key)));
         }
+        drawNewArrowRef.current = {};
       } else {
         toggleLoadedClass(elem.key);
       }
@@ -193,7 +195,7 @@ export default function MusicMappingDisplay({ content }) {
         {renderArrows()}
       </div>
 
-      <div style={{ display: 'flex', gap: '0.5rem' }}>
+      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.5rem' }}>
         <Button onClick={() => setIsCheck(prev => !prev)}>{t('check')}</Button>
         <Button
           onClick={() => {

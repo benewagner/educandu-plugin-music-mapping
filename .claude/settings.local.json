@@ -6,7 +6,16 @@
       "Bash(npx gulp:*)",
       "Bash(timeout:*)",
       "Bash(ping:*)",
-      "Bash(gulp serve)"
+      "Bash(gulp serve)",
+      "Bash(gulp build:*)",
+      "Bash(curl:*)",
+      "Bash(taskkill:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(tree:*)",
+      "Bash(npx eslint:*)",
+      "Bash(gulp)"
     ]
   }
 }
