@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Collapse, Input, Tooltip } from 'antd';
+import { Button, Collapse, Tooltip } from 'antd';
 import DeleteIcon from '@educandu/educandu/components/icons/general/delete-icon.js';
 import MoveUpIcon from '@educandu/educandu/components/icons/general/move-up-icon.js';
 import MoveDownIcon from '@educandu/educandu/components/icons/general/move-down-icon.js';
@@ -12,7 +12,8 @@ function ItemPanel({
   index,
   label,
   elemType,
-  onLabelChange,
+  answerNames,
+  questionNames,
   children,
   dragHandleProps,
   isDragged,
@@ -26,7 +27,6 @@ function ItemPanel({
   onExtraActionButtonClick
 }) {
   const { t } = useTranslation('benewagner/educandu-plugin-music-mapping');
-  const [isOpen, setIsOpen] = useState(true);
 
   const handleActionButtonWrapperClick = (event, actionButton) => {
     if (actionButton.disabled) {
@@ -104,27 +104,29 @@ function ItemPanel({
   };
 
   const renderHeader = () => {
-    if (isOpen) {
-      return (
-        <div
-          {...dragHandleProps}
-          className='ItemPanel-header MusicMapping-header'
-          style={{ display: 'flex', alignItems: 'center', marginLeft: '0.5rem' }}
-          spellCheck={false}
-          >
-          <span style={{ marginRight: '0.5rem' }}>{`${t(elemType)}: `}</span>
-          <Input value={label} placeholder='Namen eingeben...' style={{ maxWidth: '170px' }} onChange={onLabelChange} />
-        </div>
-      );
-    }
+    const isQuestion = elemType === 'question';
+    const isAnswer = elemType === 'answer';
+    const displayName = label || '—';
+    const answersText = answerNames?.length > 0 ? answerNames.join(', ') : '—';
+    const questionsText = questionNames?.length > 0 ? questionNames.join(', ') : '—';
+
     return (
       <div
         className='ItemPanel-header'
         {...dragHandleProps}
-        style={{ display: 'flex', alignItems: 'center', marginLeft: '0.5rem', height: '32px' }}
+        style={{ display: 'flex', alignItems: 'center', marginLeft: '0.5rem', height: '32px', gap: '0.5rem' }}
         >
-        <span style={{ marginRight: '20px' }}>{`${t(elemType)}:`}</span>
-        <span>{label}</span>
+        <span><strong>{t(elemType)}:</strong> {displayName}</span>
+        {!!isQuestion && (
+          <span style={{ color: '#666' }}>
+            | <strong>{t('answers')}:</strong> {answersText}
+          </span>
+        )}
+        {!!isAnswer && (
+          <span style={{ color: '#666' }}>
+            | <strong>{t('questions')}:</strong> {questionsText}
+          </span>
+        )}
       </div>
     );
   };
@@ -133,8 +135,7 @@ function ItemPanel({
     <Collapse
       collapsible='icon'
       className={classNames('ItemPanel', { 'is-dragged': isDragged, 'is-other-dragged': isOtherDragged })}
-      defaultActiveKey='panel'
-      onChange={() => setIsOpen(prev => !prev)}
+      defaultActiveKey={null}
       >
       <Collapse.Panel key='panel' header={renderHeader()} extra={renderActionButtons()}>
         <div className='ItemPanel-contentWrapper'>{children}</div>
@@ -157,6 +158,8 @@ ItemPanel.propTypes = {
   ),
   label: PropTypes.string,
   elemType: PropTypes.string.isRequired,
+  answerNames: PropTypes.arrayOf(PropTypes.string),
+  questionNames: PropTypes.arrayOf(PropTypes.string),
   index: PropTypes.number,
   dragHandleProps: PropTypes.object,
   isDragged: PropTypes.bool,
@@ -165,14 +168,15 @@ ItemPanel.propTypes = {
   onDelete: PropTypes.func,
   onExtraActionButtonClick: PropTypes.func,
   onMoveDown: PropTypes.func,
-  onMoveUp: PropTypes.func,
-  onLabelChange: PropTypes.func.isRequired
+  onMoveUp: PropTypes.func
 };
 
 ItemPanel.defaultProps = {
   canDeleteLastItem: false,
   extraActionButtons: [],
   label: '',
+  answerNames: [],
+  questionNames: [],
   index: 0,
   dragHandleProps: null,
   isDragged: false,

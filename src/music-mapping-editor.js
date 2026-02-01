@@ -112,8 +112,8 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
       newElements[index].playMidi = false;
     } else if (value === 'abc') {
       newElements[index].sourceUrl = '';
-      newElements[index].abcCode = newElements[index].abcCode || '';
-      newElements[index].playMidi = newElements[index].playMidi || false;
+      newElements[index].abcCode ||= '';
+      newElements[index].playMidi ||= false;
     } else {
       newElements[index].abcCode = '';
       newElements[index].playMidi = false;
@@ -263,6 +263,16 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
   );
 
   const renderElementItemPanel = ({ elem, index, dragHandleProps, isDragged, isOtherDragged }) => {
+    // Get answer names for questions
+    const answerKeyToLabel = new Map((answers ?? []).map(([k, lbl]) => [k, lbl]));
+    const answerNames = (elem.answers ?? []).map(key => answerKeyToLabel.get(key) || key).filter(Boolean);
+
+    // Get question names for answers (find all questions that reference this answer)
+    const questionNames = elements
+      .filter(el => el.type === 'question' && (el.answers ?? []).includes(elem.key))
+      .map(el => el.label || el.key)
+      .filter(Boolean);
+
     return (
       <ItemPanel
         index={index}
@@ -272,9 +282,9 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
         isOtherDragged={isOtherDragged}
         dragHandleProps={dragHandleProps}
         label={elem.label}
-        onLabelChange={e => onLabelChange(e, index, elem)}
+        answerNames={answerNames}
+        questionNames={questionNames}
         elemType={elem.type}
-        type={elem.type}
         onMoveUp={handleMoveElementUp}
         onMoveDown={handleMoveElementDown}
         onDelete={i => handleDeleteElement(i, elem)}
@@ -284,6 +294,10 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
             <RadioButton value='question'>{t('question')}</RadioButton>
             <RadioButton value='answer'>{t('answer')}</RadioButton>
           </RadioGroup>
+        </FormItem>
+
+        <FormItem label={t('cardName')} {...FORM_ITEM_LAYOUT}>
+          <Input value={elem.label} onChange={e => onLabelChange(e, index, elem)} />
         </FormItem>
 
         <FormItem label={t('cardType')} {...FORM_ITEM_LAYOUT}>

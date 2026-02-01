@@ -5,6 +5,9 @@ benewagner/educandu-plugin-music-mapping:
   elementType:
     en: Element type
     de: Elementtyp
+  cardName:
+    en: Name
+    de: Name
   questionHeader:
     en: Question + answer
     de: Frage + Antwort
@@ -56,9 +59,36 @@ benewagner/educandu-plugin-music-mapping:
   answers:
     en: Answers
     de: Antworten
+  questions:
+    en: Questions
+    de: Fragen
   selectAnswers:
     en: Select answers...
     de: Antworten auswählen...
   URL:
     en: URL
     de: URL
+  ariaQuestionCard:
+    en: "Question: {{content}}. Click to select for connecting."
+    de: "Frage: {{content}}. Klicken zum Auswählen für Verbindung."
+  ariaAnswerCard:
+    en: "Answer: {{content}}. Click to select for connecting."
+    de: "Antwort: {{content}}. Klicken zum Auswählen für Verbindung."
+  ariaQuestionCardSelected:
+    en: "Question: {{content}}. Selected. Click an answer to connect."
+    de: "Frage: {{content}}. Ausgewählt. Klicke eine Antwort zum Verbinden."
+  ariaAnswerCardSelected:
+    en: "Answer: {{content}}. Selected. Click a question to connect."
+    de: "Antwort: {{content}}. Ausgewählt. Klicke eine Frage zum Verbinden."
+  ariaQuestionsRegion:
+    en: Questions
+    de: Fragen
+  ariaAnswersRegion:
+    en: Answers
+    de: Antworten
+  ariaConnectionRemove:
+    en: "Connection from {{question}} to {{answer}}. Click to remove."
+    de: "Verbindung von {{question}} zu {{answer}}. Klicken zum Entfernen."
+  ariaExerciseRegion:
+    en: Music mapping exercise. Connect questions on the left with answers on the right.
+    de: Musik-Mapping-Übung. Verbinde Fragen links mit Antworten rechts.

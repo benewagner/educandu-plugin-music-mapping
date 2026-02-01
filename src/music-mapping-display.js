@@ -3,7 +3,7 @@ import Card from './Card.js';
 import { Button } from 'antd';
 import XarrowImport from 'react-xarrows';
 import { useTranslation } from 'react-i18next';
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState, useMemo } from 'react';
 import { sectionDisplayProps } from '@educandu/educandu/ui/default-prop-types.js';
 
 const Arrow = XarrowImport?.default ?? XarrowImport;
@@ -26,6 +26,7 @@ export default function MusicMappingDisplay({ content }) {
   const [userAnswers, setUserAnswers] = useState([]); // Array<[questionKey, answerKey]>
   const arrowIdentifiers = useRef(new Set()); // Set<'qKeyaKey'>
   const drawNewArrowRef = useRef({}); // { question?: key, answer?: key }
+  const [selectedKeys, setSelectedKeys] = useState({ question: null, answer: null });
 
   const correctPairsRef = useRef([]); // Array<[qKey, aKey]>
   const correctIdsRef = useRef(new Set()); // Set<'qKeyaKey'>
@@ -40,6 +41,22 @@ export default function MusicMappingDisplay({ content }) {
 
   const getCardId = key => `card-${key}`;
 
+  // Build a map from element key to label for ARIA descriptions
+  const elementLabelMap = useMemo(() => {
+    const map = new Map();
+    (elements ?? []).forEach(el => {
+      map.set(el.key, el.label || el.text || el.key);
+    });
+    return map;
+  }, [elements]);
+
+  const handleArrowClick = (qKey, aKey) => {
+    const id = `${qKey}${aKey}`;
+    arrowIdentifiers.current.delete(id);
+    setUserAnswers(prev => prev.filter(([q, a]) => !(q === qKey && a === aKey)));
+    setIsCheck(false);
+  };
+
   const renderArrows = () => {
     const getArrowColor = (qKey, aKey) => {
       if (!isCheck) {return '#c4c4c4';}
@@ -49,10 +66,48 @@ export default function MusicMappingDisplay({ content }) {
 
     const isUserAnswer = (qKey, aKey) => arrowIdentifiers.current.has(`${qKey}${aKey}`);
 
+    const hitAreaProps = (q, a) => ({
+      'onClick': () => handleArrowClick(q, a),
+      'onKeyDown': e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleArrowClick(q, a);
+        }
+      },
+      'style': { cursor: 'pointer' },
+      'className': 'MusicMapping-arrowHitArea',
+      'tabIndex': 0,
+      'role': 'button',
+      'aria-label': t('ariaConnectionRemove', {
+        question: elementLabelMap.get(q),
+        answer: elementLabelMap.get(a)
+      })
+    });
+
     return (
       <div>
         {userAnswers.map(([q, a]) => (
-          <Arrow key={`ua-${q}-${a}`} start={getCardId(q)} end={getCardId(a)} color={getArrowColor(q, a)} {...arrowProps} />
+          <React.Fragment key={`ua-${q}-${a}`}>
+            {/* Invisible hit area with larger stroke width */}
+            <Arrow
+              start={getCardId(q)}
+              end={getCardId(a)}
+              color="transparent"
+              strokeWidth={20}
+              showHead={false}
+              startAnchor="right"
+              endAnchor="left"
+              passProps={hitAreaProps(q, a)}
+              />
+            {/* Visible arrow */}
+            <Arrow
+              start={getCardId(q)}
+              end={getCardId(a)}
+              color={getArrowColor(q, a)}
+              {...arrowProps}
+              passProps={{ style: { pointerEvents: 'none' } }}
+              />
+          </React.Fragment>
         ))}
         {isCheck
           ? correctPairsRef.current.map(([q, a]) =>
@@ -84,6 +139,7 @@ export default function MusicMappingDisplay({ content }) {
       if (oldQ === elem.key) {
         clearLoadedClass(elem.key);
         delete drawNewArrowRef.current.question;
+        setSelectedKeys(prev => ({ ...prev, question: null }));
         setIsCheck(false);
         return;
       }
@@ -102,14 +158,17 @@ export default function MusicMappingDisplay({ content }) {
           setUserAnswers(prev => prev.filter(([q, a]) => !(q === elem.key && a === oldA)));
         }
         drawNewArrowRef.current = {};
+        setSelectedKeys({ question: null, answer: null });
       } else {
         toggleLoadedClass(elem.key);
+        setSelectedKeys(prev => ({ ...prev, question: elem.key }));
       }
     } else {
       // Clicking the same answer again deselects it
       if (oldA === elem.key) {
         clearLoadedClass(elem.key);
         delete drawNewArrowRef.current.answer;
+        setSelectedKeys(prev => ({ ...prev, answer: null }));
         setIsCheck(false);
         return;
       }
@@ -128,8 +187,10 @@ export default function MusicMappingDisplay({ content }) {
           setUserAnswers(prev => prev.filter(([q, a]) => !(q === oldQ && a === elem.key)));
         }
         drawNewArrowRef.current = {};
+        setSelectedKeys({ question: null, answer: null });
       } else {
         toggleLoadedClass(elem.key);
+        setSelectedKeys(prev => ({ ...prev, answer: elem.key }));
       }
     }
 
@@ -174,20 +235,42 @@ export default function MusicMappingDisplay({ content }) {
   });
 
   return (
-    <div className='EP_Educandu_Example_Display'>
+    <div className='EP_Educandu_Example_Display' role="region" aria-label={t('ariaExerciseRegion')}>
       <div style={{ display: 'flex', flexDirection: 'row', gap: '100px', width: '100%' }}>
-        <div className='MusicMapping-QuestionContainer' style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1, alignItems: 'flex-start' }}>
+        <div
+          className='MusicMapping-QuestionContainer'
+          style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1, alignItems: 'flex-start' }}
+          role="group"
+          aria-label={t('ariaQuestionsRegion')}
+          >
           {shuffledElements.map(el =>
             el.type === 'question'
-              ? <Card key={el.key} elem={el} mediaNumber={mediaNumberMap.get(el.key)} onClick={() => handleCardClick(el)} />
+              ? <Card
+                  key={el.key}
+                  elem={el}
+                  mediaNumber={mediaNumberMap.get(el.key)}
+                  onClick={() => handleCardClick(el)}
+                  isSelected={selectedKeys.question === el.key}
+                  />
               : null
           )}
         </div>
 
-        <div className='MusicMapping-AnswerContainer' style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1, alignItems: 'flex-end' }}>
+        <div
+          className='MusicMapping-AnswerContainer'
+          style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1, alignItems: 'flex-end' }}
+          role="group"
+          aria-label={t('ariaAnswersRegion')}
+          >
           {shuffledElements.map(el =>
             el.type === 'answer'
-              ? <Card key={el.key} elem={el} mediaNumber={mediaNumberMap.get(el.key)} onClick={() => handleCardClick(el)} />
+              ? <Card
+                  key={el.key}
+                  elem={el}
+                  mediaNumber={mediaNumberMap.get(el.key)}
+                  onClick={() => handleCardClick(el)}
+                  isSelected={selectedKeys.answer === el.key}
+                  />
               : null
           )}
         </div>
@@ -200,8 +283,12 @@ export default function MusicMappingDisplay({ content }) {
         <Button
           onClick={() => {
             arrowIdentifiers.current.clear();
+            drawNewArrowRef.current = {};
+            setSelectedKeys({ question: null, answer: null });
             setUserAnswers([]);
             setIsCheck(false);
+            // Clear any visual selection classes
+            shuffledElements.forEach(el => clearLoadedClass(el.key));
           }}
           >
           {t('reset')}
