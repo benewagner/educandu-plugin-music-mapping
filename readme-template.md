@@ -1,28 +1,23 @@
-# educandu-plugin-music-mapping
+# educandu-plugin-list
 
 
-A music mapping plugin for educandu
+A list plugin for educandu
 
 ---
 
 ## Functionality
 
-- Create interactive mapping exercises connecting questions with answers
-- Support for multiple card types: text, image, audio, video and ABC notation
-- Draw visual connection arrows between question and answer cards
-- Remove arrows by clicking on them
-- Check mode to verify answers (correct connections turn green, incorrect turn red)
-- Reset all connections and start over
-- Randomized display order of elements
-- ABC notation with optional MIDI audio playback
-- Drag-and-drop reordering of elements in editor
-- Copyright notices with markdown support for media elements
+- Create a list with collapsible data from csv file
+- Edit the csv headers
+- Change order of columns
+- Download modified csv file
+- Search for list items
 
 ---
 
 ## License
 
-This music mapping plugin for educandu is released under the MIT License.
+This list plugin for educandu is released under the MIT License.
 
 ---
 

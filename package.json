@@ -1,6 +1,6 @@
 {
   "name": "@benewagner/educandu-plugin-music-mapping",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A plugin for mapping media cards (question + answer)",
   "type": "module",
   "exports": {
