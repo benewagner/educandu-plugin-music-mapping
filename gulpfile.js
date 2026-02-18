@@ -25,9 +25,11 @@ let isInWatchMode = false;
 let currentCdnProxy = null;
 let currentAppBuildContext = null;
 
+const DEV_HOST = process.env.DEV_HOST || 'localhost';
+
 const testAppEnv = {
   TEST_APP_PORT: '3000',
-  TEST_APP_APP_ROOT_URL: 'http://localhost:3000',
+  TEST_APP_APP_ROOT_URL: `http://${DEV_HOST}:3000`,
   TEST_APP_WEB_CONNECTION_STRING: 'mongodb://root:rootpw@localhost:27017/dev-educandu-db?replicaSet=educandurs&authSource=admin',
   TEST_APP_SKIP_MAINTENANCE: 'false',
   TEST_APP_CDN_ENDPOINT: 'http://localhost:9000',
@@ -35,9 +37,9 @@ const testAppEnv = {
   TEST_APP_CDN_ACCESS_KEY: 'UVDXF41PYEAX0PXD8826',
   TEST_APP_CDN_SECRET_KEY: 'SXtajmM3uahrQ1ALECh3Z3iKT76s2s5GBJlbQMZx',
   TEST_APP_CDN_BUCKET_NAME: 'dev-educandu-cdn',
-  TEST_APP_CDN_ROOT_URL: 'http://localhost:10000',
+  TEST_APP_CDN_ROOT_URL: `http://${DEV_HOST}:10000`,
   TEST_APP_SESSION_SECRET: 'd4340515fa834498b3ab1aba1e4d9013',
-  TEST_APP_SESSION_COOKIE_DOMAIN: 'localhost',
+  TEST_APP_SESSION_COOKIE_DOMAIN: DEV_HOST,
   TEST_APP_SESSION_COOKIE_NAME: 'SESSION_ID_TEST_APP',
   TEST_APP_CONSENT_COOKIE_NAME_PREFIX: 'CONSENT_TEST_APP',
   TEST_APP_UPLOAD_LIABILITY_COOKIE_NAME: 'UPLOAD_LIABILITY_TEST_APP',
@@ -165,7 +167,7 @@ export async function startServer() {
     env: {
       NODE_ENV: process.env.NODE_ENV,
       PORT: 10000,
-      WEBSITE_BASE_URL: 'http://localhost:3000',
+      WEBSITE_BASE_URL: `http://${DEV_HOST}:3000`,
       CDN_BASE_URL: 'http://localhost:9000/dev-educandu-cdn',
       SESSION_COOKIE_NAME: testAppEnv.TEST_APP_SESSION_COOKIE_NAME,
       X_ROOMS_AUTH_SECRET: testAppEnv.TEST_APP_X_ROOMS_AUTH_SECRET

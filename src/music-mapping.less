@@ -68,6 +68,99 @@
   position: relative;
 }
 
+.MusicMapping-card-mediaWrapper {
+  position: relative;
+}
+
+.MusicMapping-card-enlargeBtn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 5;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+}
+
+.MusicMapping-card-infoBtn {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 5;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+}
+
+.MusicMapping-card-copyrightPopover {
+  max-width: 300px;
+  font-size: 0.85rem;
+}
+
+.MusicMapping-previewModal {
+  max-width: 90vw;
+
+  .ant-modal-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &--video .ant-modal-body {
+    height: 80vh;
+
+    .MediaPlayer {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .MediaPlayer-screen {
+      flex: 1;
+      min-height: 0;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+}
+
+.MusicMapping-previewModal-image {
+  max-width: 85vw;
+  max-height: 85vh;
+  object-fit: contain;
+}
+
 .MusicMapping-card {
   position: relative;
   border-radius: 8px;
@@ -104,6 +197,19 @@
 
 
 @media (hover: hover) {
+  .MusicMapping-card-enlargeBtn,
+  .MusicMapping-card-infoBtn {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease, visibility 0.15s ease, background-color 0.15s ease;
+  }
+
+  .MusicMapping-card-mediaWrapper:hover .MusicMapping-card-enlargeBtn,
+  .MusicMapping-card-mediaWrapper:hover .MusicMapping-card-infoBtn {
+    opacity: 1;
+    visibility: visible;
+  }
+
   // Audio cards: controls as hover extension
   .MusicMapping-card-controls {
     position: absolute;
