@@ -51,7 +51,7 @@ export default function MusicMappingDisplay({ content }) {
   }, [elements]);
 
   const handleArrowClick = (qKey, aKey) => {
-    const id = `${qKey}${aKey}`;
+    const id = `${qKey}::${aKey}`;
     arrowIdentifiers.current.delete(id);
     setUserAnswers(prev => prev.filter(([q, a]) => !(q === qKey && a === aKey)));
     setIsCheck(false);
@@ -60,11 +60,11 @@ export default function MusicMappingDisplay({ content }) {
   const renderArrows = () => {
     const getArrowColor = (qKey, aKey) => {
       if (!isCheck) {return '#c4c4c4';}
-      const id = `${qKey}${aKey}`;
+      const id = `${qKey}::${aKey}`;
       return correctIdsRef.current.has(id) ? '#4CAF50' : '#E57373';
     };
 
-    const isUserAnswer = (qKey, aKey) => arrowIdentifiers.current.has(`${qKey}${aKey}`);
+    const isUserAnswer = (qKey, aKey) => arrowIdentifiers.current.has(`${qKey}::${aKey}`);
 
     const hitAreaProps = (q, a) => ({
       'onClick': () => handleArrowClick(q, a),
@@ -149,7 +149,7 @@ export default function MusicMappingDisplay({ content }) {
 
       if (oldA) {
         clearLoadedClass(oldA);
-        const id = `${elem.key}${oldA}`;
+        const id = `${elem.key}::${oldA}`;
         if (!arrowIdentifiers.current.has(id)) {
           arrowIdentifiers.current.add(id);
           setUserAnswers(prev => [...prev, [elem.key, oldA]]);
@@ -178,7 +178,7 @@ export default function MusicMappingDisplay({ content }) {
 
       if (oldQ) {
         clearLoadedClass(oldQ);
-        const id = `${oldQ}${elem.key}`;
+        const id = `${oldQ}::${elem.key}`;
         if (!arrowIdentifiers.current.has(id)) {
           arrowIdentifiers.current.add(id);
           setUserAnswers(prev => [...prev, [oldQ, elem.key]]);
@@ -213,7 +213,7 @@ export default function MusicMappingDisplay({ content }) {
           .filter(aKey => aKey && answerKeySet.has(aKey))
           .forEach(aKey => {
             pairs.push([qKey, aKey]);
-            idSet.add(`${qKey}${aKey}`);
+            idSet.add(`${qKey}::${aKey}`);
           });
       });
 

@@ -41,6 +41,7 @@ class MusicMappingInfo {
       cardType: 'text',
       abcCode: '',
       playMidi: false,
+      playbackRange: [0, 1],
       copyrightNotice: ''
     };
   }
@@ -62,6 +63,7 @@ class MusicMappingInfo {
       cardType: joi.string().valid('text', 'image', 'audio', 'video', 'abc').required(),
       abcCode: joi.string().allow('').optional(),
       playMidi: joi.boolean().optional(),
+      playbackRange: joi.array().items(joi.number().min(0).max(1)).length(2).optional(),
       copyrightNotice: joi.string().allow('').required(),
       answers: joi.array().items(joi.string()).optional()
     });

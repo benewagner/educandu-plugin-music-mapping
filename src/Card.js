@@ -13,7 +13,7 @@ import { MEDIA_SCREEN_MODE } from '@educandu/educandu/domain/constants.js';
 import { getAccessibleUrl, isInternalSourceType } from '@educandu/educandu/utils/source-utils.js';
 
 function Card({ elem, mediaNumber, onClick, isSelected }) {
-  const { cardType, text, sourceUrl, key, abcCode, playMidi, type, label, copyrightNotice } = elem;
+  const { cardType, text, sourceUrl, key, abcCode, playMidi, type, label, copyrightNotice, playbackRange } = elem;
   const { t } = useTranslation('benewagner/educandu-plugin-music-mapping');
   const cardId = `card-${key}`;
   const clientConfig = useService(ClientConfig);
@@ -134,6 +134,7 @@ function Card({ elem, mediaNumber, onClick, isSelected }) {
             <MediaPlayer
               sourceUrl={accessibleUrl}
               screenMode={MEDIA_SCREEN_MODE.none}
+              playbackRange={playbackRange || [0, 1]}
               allowDownload={allowDownload}
               allowLoop={false}
               allowPlaybackRate={false}
@@ -196,6 +197,7 @@ function Card({ elem, mediaNumber, onClick, isSelected }) {
             <MediaPlayer
               sourceUrl={accessibleUrl}
               screenMode={MEDIA_SCREEN_MODE.video}
+              playbackRange={playbackRange || [0, 1]}
               allowDownload={allowDownload}
               allowLoop={false}
               allowPlaybackRate={false}
@@ -222,6 +224,7 @@ function Card({ elem, mediaNumber, onClick, isSelected }) {
           <MediaPlayer
             sourceUrl={accessibleUrl}
             screenMode={MEDIA_SCREEN_MODE.video}
+            playbackRange={playbackRange || [0, 1]}
             allowDownload={allowDownload}
             allowLoop={false}
             allowPlaybackRate={false}

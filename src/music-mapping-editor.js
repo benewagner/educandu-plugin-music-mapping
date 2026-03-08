@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-no-leaked-render */
-import React, { useRef, useId, useEffect } from 'react';
+import React, { useRef, useId, useEffect, useState } from 'react';
 import ItemPanel from './custom-item-panel.js';
 import { useTranslation } from 'react-i18next';
 import { PlusOutlined } from '@ant-design/icons';
@@ -13,7 +13,13 @@ import { useService } from '@educandu/educandu/components/container-context.js';
 import { sectionEditorProps } from '@educandu/educandu/ui/default-prop-types.js';
 import { FORM_ITEM_LAYOUT, SOURCE_TYPE } from '@educandu/educandu/domain/constants.js';
 import DragAndDropContainer from '@educandu/educandu/components/drag-and-drop-container.js';
+import MediaRangeSelector from '@educandu/educandu/components/media-player/media-range-selector.js';
+import MediaRangeReadonlyInput from '@educandu/educandu/components/media-player/media-range-readonly-input.js';
 import { swapItemsAt, removeItemAt, ensureIsExcluded, moveItem } from '@educandu/educandu/utils/array-utils.js';
+
+function isExternalUrl(url) {
+  return !!url && !url.startsWith('cdn:') && !url.startsWith('https://cdn.');
+}
 
 function createCopyrightForSource({ oldSourceUrl, oldCopyrightNotice, sourceUrl }) {
   if (oldSourceUrl === sourceUrl) {
@@ -22,7 +28,9 @@ function createCopyrightForSource({ oldSourceUrl, oldCopyrightNotice, sourceUrl 
   if (!sourceUrl) {
     return '';
   }
-  // Copyright notices are now handled via the CopyrightNoticeEditor or manually by the user
+  if (isExternalUrl(sourceUrl)) {
+    return `Externer [Link](${sourceUrl})`;
+  }
   return oldCopyrightNotice || '';
 }
 
@@ -38,6 +46,7 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
 
   const droppableIdRef = useRef(useId());
   const musicMappingInfo = useService(MusicMappingInfo);
+  const [newlyAddedKey, setNewlyAddedKey] = useState(null);
 
   // Einmalige Normalisierung: Falls alte Inhalte Labels in question.answers hatten,
   // versuchen wir, diese auf Keys zu mappen.
@@ -110,10 +119,12 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
       newElements[index].sourceUrl = '';
       newElements[index].abcCode = '';
       newElements[index].playMidi = false;
+      newElements[index].playbackRange = [0, 1];
     } else if (value === 'abc') {
       newElements[index].sourceUrl = '';
       newElements[index].abcCode ||= '';
       newElements[index].playMidi ||= false;
+      newElements[index].playbackRange = [0, 1];
     } else {
       newElements[index].abcCode = '';
       newElements[index].playMidi = false;
@@ -124,7 +135,9 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
   // Neues Element hinzufügen
   const handleAddButtonClick = () => {
     const newElements = cloneDeep(elements);
-    newElements.push(musicMappingInfo.getDefaultElement());
+    const newElement = musicMappingInfo.getDefaultElement();
+    newElements.push(newElement);
+    setNewlyAddedKey(newElement.key);
     changeContent({ elements: newElements });
   };
 
@@ -178,6 +191,7 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
     newElements[index] = {
       ...elem,
       sourceUrl: value,
+      playbackRange: [0, 1],
       copyrightNotice: createCopyrightForSource({
         oldSourceUrl: elem.sourceUrl,
         oldCopyrightNotice: elem.copyrightNotice,
@@ -207,6 +221,13 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
     }
 
     changeContent({ elements: newElements, answers: newAnswers });
+  };
+
+  // Abspielbereich ändern
+  const handlePlaybackRangeChange = (range, index) => {
+    const newElements = cloneDeep(elements);
+    newElements[index].playbackRange = range;
+    changeContent({ elements: newElements });
   };
 
   // Copyright Notice (Markdown) ändern
@@ -285,6 +306,7 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
         answerNames={answerNames}
         questionNames={questionNames}
         elemType={elem.type}
+        defaultExpanded={elem.key === newlyAddedKey}
         onMoveUp={handleMoveElementUp}
         onMoveDown={handleMoveElementDown}
         onDelete={i => handleDeleteElement(i, elem)}
@@ -317,6 +339,15 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
               allowedSourceTypes={elem.cardType === 'image' ? allowedImageSourceTypes : allowedMediaSourceTypes}
               onChange={value => handleSourceUrlChange(value, elem, index)}
               />
+          </Form.Item>
+        )}
+
+        {['audio', 'video'].includes(elem.cardType) && !!elem.sourceUrl && (
+          <Form.Item label={t('common:playbackRange')} {...FORM_ITEM_LAYOUT}>
+            <div className="u-input-and-button">
+              <MediaRangeReadonlyInput sourceUrl={elem.sourceUrl} playbackRange={elem.playbackRange || [0, 1]} />
+              <MediaRangeSelector sourceUrl={elem.sourceUrl} range={elem.playbackRange || [0, 1]} onRangeChange={range => handlePlaybackRangeChange(range, index)} />
+            </div>
           </Form.Item>
         )}
 

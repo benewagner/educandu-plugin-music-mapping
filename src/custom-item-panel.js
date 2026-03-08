@@ -20,6 +20,7 @@ function ItemPanel({
   isOtherDragged,
   itemsCount,
   canDeleteLastItem,
+  defaultExpanded,
   extraActionButtons,
   onMoveUp,
   onMoveDown,
@@ -135,7 +136,7 @@ function ItemPanel({
     <Collapse
       collapsible='icon'
       className={classNames('ItemPanel', { 'is-dragged': isDragged, 'is-other-dragged': isOtherDragged })}
-      defaultActiveKey={null}
+      defaultActiveKey={defaultExpanded ? ['panel'] : null}
       >
       <Collapse.Panel key='panel' header={renderHeader()} extra={renderActionButtons()}>
         <div className='ItemPanel-contentWrapper'>{children}</div>
@@ -146,6 +147,7 @@ function ItemPanel({
 
 ItemPanel.propTypes = {
   canDeleteLastItem: PropTypes.bool,
+  defaultExpanded: PropTypes.bool,
   children: PropTypes.node.isRequired,
   extraActionButtons: PropTypes.arrayOf(
     PropTypes.shape({
@@ -173,6 +175,7 @@ ItemPanel.propTypes = {
 
 ItemPanel.defaultProps = {
   canDeleteLastItem: false,
+  defaultExpanded: false,
   extraActionButtons: [],
   label: '',
   answerNames: [],
