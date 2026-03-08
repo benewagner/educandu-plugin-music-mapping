@@ -3,6 +3,7 @@ import React from 'react';
 import MusicMappingIcon from './music-mapping-icon.js';
 import uniqueId from '@educandu/educandu/utils/unique-id.js';
 import cloneDeep from '@educandu/educandu/utils/clone-deep.js';
+import { PLUGIN_GROUP } from '@educandu/educandu/domain/constants.js';
 import { couldAccessUrlFromRoom } from '@educandu/educandu/utils/source-utils.js';
 import GithubFlavoredMarkdown from '@educandu/educandu/common/github-flavored-markdown.js';
 
@@ -21,6 +22,10 @@ class MusicMappingInfo {
 
   getIcon() {
     return <MusicMappingIcon />;
+  }
+
+  getGroups() {
+    return [PLUGIN_GROUP.interactive];
   }
 
   async resolveDisplayComponent() {

@@ -46,7 +46,7 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
 
   const droppableIdRef = useRef(useId());
   const musicMappingInfo = useService(MusicMappingInfo);
-  const [newlyAddedKey, setNewlyAddedKey] = useState(null);
+  const [newlyAddedKey, setNewlyAddedKey] = useState(elements.length === 1 ? elements[0].key : null);
 
   // Einmalige Normalisierung: Falls alte Inhalte Labels in question.answers hatten,
   // versuchen wir, diese auf Keys zu mappen.
