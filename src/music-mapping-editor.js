@@ -72,11 +72,24 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
       return el;
     });
 
+    // Initiale Fragen ohne Label mit Standardnamen versehen
+    let questionIndex = 0;
+    const withLabels = normalized.map(el => {
+      if (el.type === 'question') {
+        questionIndex += 1;
+        if (!el.label) {
+          changed = true;
+          return { ...el, label: `${t('question')} ${questionIndex}` };
+        }
+      }
+      return el;
+    });
+
     if (changed) {
-      onContentChanged({ ...content, elements: normalized });
+      onContentChanged({ ...content, elements: withLabels });
     }
     didNormalizeRef.current = true;
-  }, [content, elements, answers, onContentChanged]);
+  }, [content, elements, answers, onContentChanged, t]);
 
   const changeContent = newContentValues => {
     const newContent = { ...content, ...newContentValues };
