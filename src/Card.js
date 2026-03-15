@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Modal, Popover } from 'antd';
 import { ExpandOutlined, InfoCircleOutlined } from '@ant-design/icons';
@@ -19,6 +19,21 @@ function Card({ elem, mediaNumber, onClick, isSelected }) {
   const clientConfig = useService(ClientConfig);
   const [abcRenderResult, setAbcRenderResult] = useState(null);
   const [previewVisible, setPreviewVisible] = useState(false);
+  const [isTextOverflowing, setIsTextOverflowing] = useState(false);
+  const textWrapperRef = useRef(null);
+
+  const checkTextOverflow = useCallback(() => {
+    const el = textWrapperRef.current;
+    if (el) {
+      setIsTextOverflowing(el.scrollHeight > el.clientHeight);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkTextOverflow();
+    window.addEventListener('resize', checkTextOverflow);
+    return () => window.removeEventListener('resize', checkTextOverflow);
+  }, [checkTextOverflow, text]);
 
   // Convert CDN URLs to accessible URLs
   const accessibleUrl = getAccessibleUrl({ url: sourceUrl, cdnRootUrl: clientConfig.cdnRootUrl });
@@ -70,7 +85,7 @@ function Card({ elem, mediaNumber, onClick, isSelected }) {
     flexDirection: isQuestion ? 'row' : 'row-reverse',
     border: '1px solid lightgrey',
     cursor: 'pointer',
-    width: '340px',
+    width: '400px',
     boxSizing: 'border-box'
   };
 
@@ -86,7 +101,16 @@ function Card({ elem, mediaNumber, onClick, isSelected }) {
 
   const contentStyle = {
     flex: 1,
-    padding: '0.8rem'
+    padding: '0.8rem',
+    display: 'flex',
+    flexDirection: 'column'
+  };
+
+  const textWrapperStyle = {
+    display: '-webkit-box',
+    WebkitLineClamp: 7,
+    WebkitBoxOrient: 'vertical',
+    overflow: 'hidden'
   };
 
   const stopPropagation = e => e.stopPropagation();
@@ -151,9 +175,24 @@ function Card({ elem, mediaNumber, onClick, isSelected }) {
   const renderTextCard = () => (
     <div id={cardId} className={cardClassName} style={cardStyle} onClick={onClick} {...ariaProps}>
       <div className="MusicMapping-card-content" style={contentStyle}>
-        {text !== '' ? <div>{text}</div> : null}
+        <div className="MusicMapping-card-mediaWrapper">
+          {text !== '' ? <div ref={textWrapperRef} style={textWrapperStyle}>{text}</div> : null}
+          {isTextOverflowing && renderEnlargeButton()}
+        </div>
       </div>
       <div className="MusicMapping-clickArea" />
+      <Modal
+        open={previewVisible}
+        footer={null}
+        onCancel={() => setPreviewVisible(false)}
+        centered
+        width={600}
+        className="MusicMapping-previewModal"
+        >
+        <div style={{ maxHeight: '85vh', overflow: 'auto' }}>
+          {text}
+        </div>
+      </Modal>
     </div>
   );
 

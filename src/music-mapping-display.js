@@ -74,7 +74,7 @@ export default function MusicMappingDisplay({ content }) {
           handleArrowClick(q, a);
         }
       },
-      'style': { cursor: 'pointer' },
+      'style': { cursor: 'pointer', pointerEvents: 'auto' },
       'className': 'MusicMapping-arrowHitArea',
       'tabIndex': 0,
       'role': 'button',
@@ -85,7 +85,7 @@ export default function MusicMappingDisplay({ content }) {
     });
 
     return (
-      <div>
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
         {userAnswers.map(([q, a]) => (
           <React.Fragment key={`ua-${q}-${a}`}>
             {/* Invisible hit area with larger stroke width */}
@@ -224,6 +224,9 @@ export default function MusicMappingDisplay({ content }) {
 
   if (!shuffledElements) {return null;}
 
+  const questionCount = shuffledElements.filter(el => el.type === 'question').length;
+  const isSingleQuestion = questionCount <= 1;
+
   // Build media number map: assign sequential numbers to all audio and video cards
   const mediaNumberMap = new Map();
   let mediaCounter = 1;
@@ -236,10 +239,10 @@ export default function MusicMappingDisplay({ content }) {
 
   return (
     <div className='EP_Educandu_Example_Display' role="region" aria-label={t('ariaExerciseRegion')}>
-      <div style={{ display: 'flex', flexDirection: 'row', gap: '100px', width: '100%' }}>
+      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%', position: 'relative' }}>
         <div
           className='MusicMapping-QuestionContainer'
-          style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1, alignItems: 'flex-start' }}
+          style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
           role="group"
           aria-label={t('ariaQuestionsRegion')}
           >
@@ -258,7 +261,7 @@ export default function MusicMappingDisplay({ content }) {
 
         <div
           className='MusicMapping-AnswerContainer'
-          style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1, alignItems: 'flex-end' }}
+          style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
           role="group"
           aria-label={t('ariaAnswersRegion')}
           >
@@ -279,8 +282,9 @@ export default function MusicMappingDisplay({ content }) {
       </div>
 
       <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.5rem' }}>
-        <Button onClick={() => setIsCheck(prev => !prev)}>{t('check')}</Button>
+        <Button disabled={isSingleQuestion} onClick={() => setIsCheck(prev => !prev)}>{t('check')}</Button>
         <Button
+          disabled={isSingleQuestion}
           onClick={() => {
             arrowIdentifiers.current.clear();
             drawNewArrowRef.current = {};

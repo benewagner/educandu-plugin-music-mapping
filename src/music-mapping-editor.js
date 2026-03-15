@@ -4,7 +4,7 @@ import ItemPanel from './custom-item-panel.js';
 import { useTranslation } from 'react-i18next';
 import { PlusOutlined } from '@ant-design/icons';
 import MusicMappingInfo from './music-mapping-info.js';
-import { Form, Button, Radio, Input, Select, Checkbox } from 'antd';
+import { Form, Button, Radio, Input, Select, Checkbox, Alert } from 'antd';
 import cloneDeep from '@educandu/educandu/utils/clone-deep.js';
 import UrlInput from '@educandu/educandu/components/url-input.js';
 import AbcInput from '@educandu/educandu/components/abc-input.js';
@@ -89,21 +89,27 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
     const newElements = cloneDeep(elements);
     let newAnswers = [...answers ?? []];
 
+    const oldType = newElements[index].type;
     newElements[index].type = value;
+
+    // Auto-rename if label matches old auto-generated pattern
+    const oldLabel = newElements[index].label ?? '';
+    const oldPrefix = oldType === 'question' ? t('question') : t('answer');
+    if (!oldLabel || /^\s*$/.test(oldLabel) || new RegExp(`^${oldPrefix} \\d+$`).test(oldLabel)) {
+      const newPrefix = value === 'question' ? t('question') : t('answer');
+      const countOfNewType = newElements.filter((el, i) => i !== index && el.type === value).length;
+      newElements[index].label = `${newPrefix} ${countOfNewType + 1}`;
+    }
 
     if (value === 'question') {
       // Wenn es vorher eine answer war: Mapping-Eintrag entfernen
       newAnswers = newAnswers.filter(a => a?.[0] !== elem.key);
-      // Frage sollte keine Media-spezifischen Felder verlieren; belassen
-      // answers-Liste der Frage bleibt unberührt
     } else {
       // Wird zu answer: Mapping [key, label] erzeugen (falls noch nicht vorhanden)
       const exists = newAnswers.some(a => a?.[0] === elem.key);
       if (!exists) {
         newAnswers.push([elem.key, newElements[index].label ?? '']);
       }
-      // Falls es vorher eine Frage war: deren question.answers (Keys) bleiben bei der Frage,
-      // aber dieses Element ist jetzt answer – andere Fragen behalten ihre Referenzen (Keys)
     }
 
     changeContent({ elements: newElements, answers: newAnswers });
@@ -136,6 +142,8 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
   const handleAddButtonClick = () => {
     const newElements = cloneDeep(elements);
     const newElement = musicMappingInfo.getDefaultElement();
+    const questionCount = newElements.filter(el => el.type === 'question').length;
+    newElement.label = `${t('question')} ${questionCount + 1}`;
     newElements.push(newElement);
     setNewlyAddedKey(newElement.key);
     changeContent({ elements: newElements });
@@ -382,6 +390,10 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
       renderElementItemPanel({ elem, index, dragHandleProps, isDragged, isOtherDragged })
   }));
 
+  const questionsWithoutAnswers = elements
+    .filter(el => el.type === 'question' && (!el.answers || el.answers.length === 0))
+    .map(el => el.label || el.key);
+
   return (
     <div className='EP_Educandu_Example_Editor'>
       <Form labelAlign='left'>
@@ -391,6 +403,15 @@ export default function MusicMappingEditor({ content, onContentChanged }) {
           onItemMove={handleMoveElement}
           />
       </Form>
+
+      {questionsWithoutAnswers.length > 0 && (
+        <Alert
+          type="warning"
+          showIcon
+          message={`${t('questionsWithoutAnswers')} ${questionsWithoutAnswers.join(', ')}`}
+          style={{ marginBottom: '0.75rem' }}
+          />
+      )}
 
       <Button type='primary' icon={<PlusOutlined />} onClick={handleAddButtonClick}>
         {t('addElement')}

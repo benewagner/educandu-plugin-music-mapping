@@ -89,6 +89,9 @@ benewagner/educandu-plugin-music-mapping:
   ariaConnectionRemove:
     en: "Connection from {{question}} to {{answer}}. Click to remove."
     de: "Verbindung von {{question}} zu {{answer}}. Klicken zum Entfernen."
+  questionsWithoutAnswers:
+    en: "The following questions have no answers assigned:"
+    de: "Folgenden Fragen wurden keine Antworten zugewiesen:"
   ariaExerciseRegion:
     en: Music mapping exercise. Connect questions on the left with answers on the right.
     de: Musik-Mapping-Übung. Verbinde Fragen links mit Antworten rechts.
